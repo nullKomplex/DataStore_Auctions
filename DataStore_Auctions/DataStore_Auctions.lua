@@ -101,18 +101,22 @@ local maxTimeLeft = { 30*60, 2*60*60, 12*60*60, 48*60*60 }
 
 local function CheckExpiries()
 	local AHTypes = { "Auctions", "Bids" }
-	local timeLeft, diff
+	local diff
 	
 	for key, character in pairs(addon.db.global.Characters) do
 		for _, ahType in pairs(AHTypes) do					-- browse both auctions & bids
 			for index = #character[ahType], 1, -1 do		-- from last to first, to make sure table.remove does not screw up indexes.
-				timeLeft = select(7, _GetAuctionHouseItemInfo(character, ahType, index))
+				local isGoblin, itemID, count, name, price1, price2, timeLeft = _GetAuctionHouseItemInfo(character, ahType, index)
 				if not timeLeft or (timeLeft < 1) or (timeLeft > 4) then
 					timeLeft = 4	-- timeLeft is supposed to always be between 1 and 4, if it's not in this range, set it to the longest value (4 = more than 12 hours)
 				end
 
 				diff = time() - character.lastUpdate
 				if diff > maxTimeLeft[timeLeft] then	-- has expired
+                    if (DataStore_Mails) then
+                        -- Saving empty mail, because no way of knowing if the auction/bid was successful. It could be an item or gold, won't know until its checked. 
+                        DataStore:SaveMailToCache(character, 0, "", AUCTIONS, MINIMAP_TRACKING_AUCTIONEER)
+                    end
 					table.remove(character[ahType], index)
 				end
 			end
