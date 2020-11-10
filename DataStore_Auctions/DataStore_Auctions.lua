@@ -115,7 +115,7 @@ local function CheckExpiries()
 				if diff > maxTimeLeft[timeLeft] then	-- has expired
                     if (DataStore_Mails) then
                         -- Saving empty mail, because no way of knowing if the auction/bid was successful. It could be an item or gold, won't know until its checked. 
-                        DataStore:SaveMailToCache(character, 0, "", AUCTIONS, MINIMAP_TRACKING_AUCTIONEER)
+                        DataStore:SaveMailToCache(key, 0, "", AUCTIONS, MINIMAP_TRACKING_AUCTIONEER)
                     end
 					table.remove(character[ahType], index)
 				end
@@ -141,7 +141,7 @@ function addon:OnEnable()
 	addon:SetupOptions()
 	
 	if GetOption("AutoClearExpiredItems") then
-		addon:ScheduleTimer(CheckExpiries, 3)	-- check AH expiries 3 seconds later, to decrease the load at startup
+		addon:ScheduleTimer(CheckExpiries, 8)	-- check AH expiries 8 seconds later, to decrease the load at startup
 	end
 end
 
